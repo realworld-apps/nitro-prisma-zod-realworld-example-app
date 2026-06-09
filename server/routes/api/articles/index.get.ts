@@ -1,8 +1,10 @@
 import articleMapper from "~/utils/article.mapper";
 import {definePrivateEventHandler} from "~/auth-event-handler";
+import {articleListQuerySchema} from "~/schemas/article.schema";
+import {validateQuery} from "~/utils/validate";
 
 export default definePrivateEventHandler(async (event, {auth}) => {
-    const query = getQuery(event);
+    const query = validateQuery(articleListQuerySchema, getQuery(event));
 
     const andQueries = buildFindAllQuery(query, auth);
     const articlesCount = await usePrisma().article.count({
@@ -19,8 +21,8 @@ export default definePrivateEventHandler(async (event, {auth}) => {
         orderBy: {
             createdAt: 'desc',
         },
-        skip: Number(query.offset) || 0,
-        take: Number(query.limit) || 10,
+        skip: query.offset,
+        take: query.limit,
         include: {
             tagList: {
                 orderBy: {
