@@ -40,7 +40,7 @@ export default definePrivateEventHandler(async (event, {auth}) => {
                     username: true,
                     bio: true,
                     image: true,
-                    followedBy: true,
+                    followedBy: useViewerOnly(auth?.id),
                 },
             },
         },

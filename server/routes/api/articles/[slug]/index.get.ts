@@ -20,10 +20,10 @@ const slug = getRouterParam(event, 'slug');
                     username: true,
                     bio: true,
                     image: true,
-                    followedBy: true,
+                    followedBy: useViewerOnly(auth?.id),
                 },
             },
-            favoritedBy: true,
+            favoritedBy: useViewerOnly(auth?.id),
             _count: {
                 select: {
                     favoritedBy: true,

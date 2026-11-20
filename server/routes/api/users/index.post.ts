@@ -30,7 +30,10 @@ export default defineEventHandler(async (event) => {
         setResponseStatus(event, 201);
         return {
             user: {
-                ...createdUser,
+                email: createdUser.email,
+                username: createdUser.username,
+                bio: createdUser.bio,
+                image: createdUser.image,
                 token: useGenerateToken(createdUser.id),
             }
         };

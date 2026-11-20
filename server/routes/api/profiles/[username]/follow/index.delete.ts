@@ -7,6 +7,7 @@ export default definePrivateEventHandler(async (event, {auth}) => {
 
     const user = await usePrisma().user.findUnique({
         where: { username },
+        select: { id: true },
     });
 
     if (!user) {
@@ -24,8 +25,11 @@ export default definePrivateEventHandler(async (event, {auth}) => {
                 },
             },
         },
-        include: {
-            followedBy: true,
+        select: {
+            username: true,
+            bio: true,
+            image: true,
+            followedBy: useViewerOnly(auth?.id),
         },
     });
 

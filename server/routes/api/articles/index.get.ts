@@ -33,11 +33,12 @@ export default definePrivateEventHandler(async (event, {auth}) => {
             author: {
                 select: {
                     username: true,
+                    bio: true,
                     image: true,
-                    followedBy: { select: { id: true } },
+                    followedBy: useViewerOnly(auth?.id),
                 },
             },
-            favoritedBy: { select: { id: true } },
+            favoritedBy: useViewerOnly(auth?.id),
             _count: {
                 select: {
                     favoritedBy: true,

@@ -17,7 +17,10 @@ export default definePrivateEventHandler(async (event, {auth}) => {
 
     return {
         user: {
-            ...user,
+            email: user.email,
+            username: user.username,
+            bio: user.bio,
+            image: user.image,
             token: useGenerateToken(user.id),
         }
     };

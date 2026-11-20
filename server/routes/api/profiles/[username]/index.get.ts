@@ -9,8 +9,11 @@ export default definePrivateEventHandler(async (event, {auth}) => {
         where: {
             username,
         },
-        include: {
-            followedBy: true,
+        select: {
+            username: true,
+            bio: true,
+            image: true,
+            followedBy: useViewerOnly(auth?.id),
         },
     });
 
