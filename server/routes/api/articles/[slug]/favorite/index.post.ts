@@ -1,17 +1,16 @@
 import HttpException from "~/models/http-exception.model";
-import profileMapper from "~/utils/profile.utils";
-import {Tag} from "~/models/tag.model";
+import articleMapper from "~/utils/article.mapper";
 import {definePrivateEventHandler} from "~/auth-event-handler";
 
 export default definePrivateEventHandler(async (event, {auth}) => {
     const slug = getRouterParam(event, "slug");
 
-    const existing = await usePrisma().article.findUnique({ where: { slug } });
+    const existing = await usePrisma().article.findUnique({ where: { slug }, select: { id: true } });
     if (!existing) {
         throw new HttpException(404, {errors: {article: ['not found']}});
     }
 
-    const { _count, ...article } = await usePrisma().article.update({
+    const article = await usePrisma().article.update({
         where: {
             slug,
         },
@@ -33,10 +32,10 @@ export default definePrivateEventHandler(async (event, {auth}) => {
                     username: true,
                     bio: true,
                     image: true,
-                    followedBy: true,
+                    followedBy: useViewerOnly(auth?.id),
                 },
             },
-            favoritedBy: true,
+            favoritedBy: useViewerOnly(auth?.id),
             _count: {
                 select: {
                     favoritedBy: true,
@@ -45,13 +44,5 @@ export default definePrivateEventHandler(async (event, {auth}) => {
         },
     });
 
-    const result = {
-        ...article,
-        author: profileMapper(article.author, auth.id),
-        tagList: article?.tagList.map((tag: Tag) => tag.name),
-        favorited: article.favoritedBy.some((favorited: any) => favorited.id === auth.id),
-        favoritesCount: _count?.favoritedBy,
-    };
-
-    return {article: result};
+    return {article: articleMapper(article, auth.id)};
 });
